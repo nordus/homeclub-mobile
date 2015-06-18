@@ -55,9 +55,6 @@
       var pushNotification, token;
       pushNotification = window.plugins.pushNotification;
       if (ionic.Platform.isAndroid()) {
-        if (window.StatusBar) {
-          StatusBar.backgroundColorByHexString('#6cc6c6');
-        }
         token = localStorage.getItem('Android_token');
         if (!token) {
           pushNotification.register(pushCallbacks.GCM.successfulRegistration, pushCallbacks.errorHandler, {

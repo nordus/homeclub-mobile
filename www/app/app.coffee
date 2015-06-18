@@ -56,10 +56,6 @@ angular.module("hcMobile", [
 
     # register with APN/GCM, then send token to alerts server
     if ionic.Platform.isAndroid()
-      # set status bar color on Android 5.0 and up
-      # https://github.com/apache/cordova-plugin-statusbar
-      StatusBar.backgroundColorByHexString( '#6cc6c6' )  if window.StatusBar
-
       token = localStorage.getItem 'Android_token'
       unless token
         pushNotification.register pushCallbacks.GCM.successfulRegistration, pushCallbacks.errorHandler,
