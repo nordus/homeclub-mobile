@@ -8829,6 +8829,16 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.bar-calm .button, .bar-calm .button:hover {
+  color: #328181; }
+
+.bar.bar-calm .title {
+  color: #edf8f8; }
+
+.checkbox input, .checkbox-icon {
+  height: 24px;
+  width: 24px; }
+
 .item-divider {
   background-color: #f8f8f8;
   color: #919191; }
@@ -8843,6 +8853,9 @@ a.button {
   background: -webkit-linear-gradient(top, #fafafa, #f2f2f2);
   color: #636363 !important;
   text-shadow: 0 1px rgba(255, 255, 255, 0.5); }
+
+.item-note {
+  font-size: 13px; }
 
 .pane, .view, .menu {
   background-color: #fafcfe; }

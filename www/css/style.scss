@@ -3,6 +3,17 @@ $balanced: #136d6d !default;
 
 @import "../lib/ionic/scss/ionic";
 
+.bar-calm {
+  .button, .button:hover {
+    color: darken($calm, 25%);
+  }
+}
+.bar.bar-calm .title {
+  color: lighten( $calm, 35% );
+}
+
+.checkbox input, .checkbox-icon { height:24px; width:24px }
+
 .item-divider {
     background-color: #f8f8f8;
     color: #919191;
@@ -18,6 +29,9 @@ $balanced: #136d6d !default;
   background: -webkit-linear-gradient(top, #fafafa, #f2f2f2);
   color: #636363 !important;
   text-shadow: 0 1px rgba(255,255,255,0.5);
+}
+.item-note {
+  font-size: 13px;
 }
 .pane, .view, .menu {
   background-color: #fafcfe;
