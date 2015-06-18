@@ -1,0 +1,15 @@
+ion-view(title='HomeClub')
+  ion-nav-bar.bar-calm
+  ion-content.has-header
+    form(ng-submit='login(user)')
+      .list
+        label.item.item-input
+          span.input-label Email
+          input(type='email', ng-model='user.email', name='email')
+        label.item.item-input
+          span.input-label Password
+          input(type='password', ng-model='user.password', name='password')
+      .padding
+        input.button.button-block.button-calm(type='submit', value='Log in')
+        p.text-center
+          a(href='#/forgot-password') Forgot password

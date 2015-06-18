@@ -1,0 +1,29 @@
+$calm: #6cc6c6 !default;
+$balanced: #136d6d !default;
+
+@import "../lib/ionic/scss/ionic";
+
+.item-divider {
+    background-color: #f8f8f8;
+    color: #919191;
+}
+.item {
+    color: #454f5e;
+}
+.item-icon-left .icon {
+    color: $calm;
+}
+
+.item-divider {
+  background: -webkit-linear-gradient(top, #fafafa, #f2f2f2);
+  color: #636363 !important;
+  text-shadow: 0 1px rgba(255,255,255,0.5);
+}
+.pane, .view, .menu {
+  background-color: #fafcfe;
+}
+
+a {
+    color: #4183c4;
+    text-decoration: none;
+}

@@ -1,0 +1,40 @@
+style.
+  #sensor-setup .item-icon-left .icon { color:#444 !important }
+  .item-checkbox > .item { padding-top:5px; padding-bottom:5px }
+  .checkbox input, .checkbox-icon { height:24px; margin-left:74px; width:24px }
+ion-view#sensor-setup(view-title='Sensor Setup')
+  ion-nav-bar.bar-calm
+    ion-nav-buttons(side='left')
+      button(menu-toggle='left').button.button-icon.icon.ion-navicon
+    //h1.title Sensor Setup
+    ion-nav-buttons(side='right')
+      button.button.button-clear(ng-click='save()') Save
+  ion-content.has-header
+    .card(ng-repeat='sensorHub in sensorHubs')
+      .item.item-divider
+        | {{ meta.sensorHubTypes[sensorHub.sensorHubType] }}
+        .item-note {{ sensorHub._id }}
+      label.item.item-input.item-select
+        .input-label Room
+        select(ng-model='sensorHub.roomType', ng-options='roomTypeId as roomTypeName for (roomTypeId, roomTypeName) in meta.roomTypes')
+      label.item.item-input.item-select(ng-if='sensorHub.sensorHubType == 1')
+        .input-label Water source
+        select(ng-model='sensorHub.waterSource', ng-options='waterSourceId as waterSourceName for (waterSourceId, waterSourceName) in meta.waterSources')
+
+      .item(ng-repeat='sensorType in sensorTypesOfCurrentSensorHub(sensorHub)')
+        h3 {{ sensorType | capitalize }} alerts
+        .row
+          .col.item.item-checkbox(style='border:none; padding:0 5px;')
+            //span.input-label
+            .item.item-icon-left
+              i.icon.ion-email
+              | &nbsp;
+            label.checkbox.checkbox-calm
+              input(type='checkbox', ng-checked="isChecked(sensorHub, sensorType, 'email')", ng-click="toggleSubscription(sensorHub, 'email', sensorType)")
+          .col.item.item-checkbox(style='border:none; padding:0 5px;')
+            //span.input-label
+            .item.item-icon-left
+              i.icon.ion-iphone
+              |  &nbsp;
+            label.checkbox.checkbox-calm
+              input(type='checkbox', ng-checked="isChecked(sensorHub, sensorType, 'sms')", ng-click="toggleSubscription(sensorHub, 'sms', sensorType)")

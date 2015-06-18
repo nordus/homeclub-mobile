@@ -1,0 +1,20 @@
+ion-view(view-title='Dashboard')
+  ion-nav-bar.bar-calm
+    ion-nav-buttons(side='left')
+      button(menu-toggle='left').button.button-icon.icon.ion-navicon
+    ion-nav-buttons(side='right')
+      button.button.button-icon(ng-click='refreshLatest()', ng-class="{'ion-refresh':!loading, 'ion-refreshing':loading}")
+  ion-content.has-header
+    .card(ng-repeat='(sensorHubMacAddress, roomName) in currentUser.roomNamesBySensorHubMacAddress')
+      .item.item-divider
+        | {{ roomName }}
+        .item-note {{ latest[sensorHubMacAddress].timestamp | date:'MMM d h:mm a' }}
+      .item.item-icon-left(ng-show='latest[sensorHubMacAddress].sensorHubData1 != undefined')
+        i.icon.ion-thermometer
+        | {{ latest[sensorHubMacAddress].sensorHubData1 }} ℉
+      .item.item-icon-left(ng-show='latest[sensorHubMacAddress].sensorHubData2 != undefined')
+        i.icon.ion-lightbulb
+        | {{ latest[sensorHubMacAddress].sensorHubData2 }} lux
+      .item.item-icon-left(ng-show='latest[sensorHubMacAddress].sensorHubData3 != undefined')
+        i.icon.ion-ios-rainy
+        | {{ latest[sensorHubMacAddress].sensorHubData3 }}%
