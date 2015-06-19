@@ -8829,6 +8829,16 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+#sensor-setup .item-icon-left .icon {
+  color: #444 !important; }
+
+#sensor-setup .item-checkbox > .item {
+  padding-top: 5px;
+  padding-bottom: 5px; }
+
+#sensor-setup .checkbox input {
+  left: 54px; }
+
 .bar-calm .button, .bar-calm .button:hover {
   color: #328181; }
 

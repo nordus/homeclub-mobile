@@ -1,13 +1,8 @@
-style.
-  #sensor-setup .item-icon-left .icon { color:#444 !important }
-  #sensor-setup .item-checkbox > .item { padding-top:5px; padding-bottom:5px }
-  #sensor-setup .checkbox input { left:54px }
 ion-view#sensor-setup(view-title='Sensor Setup')
-  ion-nav-bar.bar-calm
-    ion-nav-buttons(side='left')
-      button(menu-toggle='left').button.button-icon.icon.ion-navicon
-    ion-nav-buttons(side='right')
-      button.button.button-clear(ng-click='save()') Save
+
+  ion-nav-buttons(side='right')
+    button.button.button-clear(ng-click='save()') Save
+
   ion-content.has-header
     .card(ng-repeat='sensorHub in sensorHubs')
       .item.item-divider

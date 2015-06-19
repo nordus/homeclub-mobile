@@ -1,9 +1,11 @@
 ion-view(view-title='Dashboard')
-  ion-nav-bar.bar-calm
-    ion-nav-buttons(side='left')
-      button(menu-toggle='left').button.button-icon.icon.ion-navicon
-    ion-nav-buttons(side='right')
-      button.button.button-icon(ng-click='refreshLatest()', ng-class="{'ion-refresh':!loading, 'ion-refreshing':loading}")
+
+  ion-nav-buttons(side='right')
+    button.button.button-icon(ng-click='refreshLatest()')
+      i.icon.ion-android-refresh(ng-hide='loading')
+      i.icon(ng-show='loading')
+        ion-spinner
+
   ion-content.has-header
     .card(ng-repeat='(sensorHubMacAddress, roomName) in currentUser.roomNamesBySensorHubMacAddress')
 
