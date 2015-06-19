@@ -71,6 +71,9 @@ app.controller('SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, Se
     AuthFactory
       .login(user)
       .success((data) ->
+
+        localStorage.userCredentials = JSON.stringify user
+
         $http.get(baseUrl+'/me/customer-account').success((currentUser) ->
 
           SessionFactory.createSession(currentUser)
@@ -91,4 +94,8 @@ app.controller('SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, Se
         $rootScope.hideLoading()
         $rootScope.toast 'Invalid Credentials'
       )
+
+  if localStorage.userCredentials
+    $scope.login JSON.parse( localStorage.userCredentials )
+
 )

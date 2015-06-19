@@ -69,10 +69,11 @@
   });
 
   app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) {
-    return $scope.login = function(user) {
+    $scope.login = function(user) {
       console.log('..logging in');
       $rootScope.showLoading("Authenticating..");
       return AuthFactory.login(user).success(function(data) {
+        localStorage.userCredentials = JSON.stringify(user);
         return $http.get(baseUrl + '/me/customer-account').success(function(currentUser) {
           SessionFactory.createSession(currentUser);
           return sensorhub.query({
@@ -88,6 +89,9 @@
         return $rootScope.toast('Invalid Credentials');
       });
     };
+    if (localStorage.userCredentials) {
+      return $scope.login(JSON.parse(localStorage.userCredentials));
+    }
   });
 
 }).call(this);
