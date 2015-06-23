@@ -103,3 +103,44 @@ services.factory('sensorhub', ($resource) ->
 services.factory('meta', ->
   meta
 )
+
+services.factory 'alerttext', ( $filter ) ->
+
+  sensorHubEvent: (message) ->
+    eventDate = $filter('date')(message.timestamp, 'MMM d h:mm a')
+    eventResolved = message.sensorEventEnd isnt 0
+    if eventResolved
+      eventType = message.sensorEventEnd
+    else
+      eventType = message.sensorEventStart
+    alertText = switch eventType
+      when 1 then '<i class="icon ion-waterdrop"></i> Water detect'
+      when 2 then '<i class="icon ion-eye"></i> Motion detect'
+      when 3 then '<i class="icon ion-thermometer"></i> Low temperature'
+      when 4 then '<i class="icon ion-thermometer"></i> High temperature'
+      when 5 then '<i class="icon ion-ios-rainy"></i> Low humidity'
+      when 6 then '<i class="icon ion-ios-rainy"></i> High humidity'
+      when 7 then '<i class="icon ion-lightbulb"></i> Low light'
+      when 8 then '<i class="icon ion-lightbulb"></i> High light'
+      when 9 then '<i class="icon ion-reply-all"></i> Movement'
+    if eventResolved
+      alertText += ' resolved'
+    alertText += " <span class='small-text'>#{eventDate}</span>"
+    if eventType is 1
+      alertText = '<span class="red">' + alertText + '</span>'
+    alertText
+
+services.factory 'alert', ( $resource ) ->
+  $resource baseUrl+'/search',
+    msgType : 4
+    start   : "'12 hours ago'"
+  ,
+    query:
+      method: 'GET'
+      params: {}
+      isArray: true
+      transformResponse: ( data, header ) ->
+        jsonData = JSON.parse( data )
+        # remove first alert from array as it is already displayed as 'latestAlert'
+        jsonData.pop()
+        return jsonData

@@ -1,11 +1,19 @@
 $calm: #6cc6c6 !default;
 $balanced: #136d6d !default;
+$positive: #4183c4 !default;
 
 @import "../lib/ionic/scss/ionic";
 
 #sensor-setup .item-icon-left .icon { color:#444 !important }
 #sensor-setup .item-checkbox > .item { padding-top:5px; padding-bottom:5px }
 #sensor-setup .checkbox input { left:54px }
+
+#dashboard .item.ok {
+  border:none; height:20px; padding:0; text-align:center;
+  .button-small {
+    line-height:14px; min-height:14px
+  }
+}
 
 .bar-calm {
   .button, .button:hover {
@@ -27,6 +35,31 @@ $balanced: #136d6d !default;
 }
 .item-icon-left .icon {
     color: $calm;
+}
+
+.item-icon-left.alert {
+  color: #8A6D3B;
+  .icon {
+    color: #8A6D3B;
+  }
+  .icon.ion-waterdrop {
+    color: #A94442;
+  }
+}
+.item-button-right.alert > .button {
+  right: 4px;
+}
+.red {
+  color: #A94442;
+}
+.alert {
+  font-size: 14px;
+}
+.small-text {
+  font-size:11px;
+}
+.text {
+  font-size:100%;
 }
 
 .item-divider {

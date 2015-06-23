@@ -114,4 +114,68 @@
     return meta;
   });
 
+  services.factory('alerttext', function($filter) {
+    return {
+      sensorHubEvent: function(message) {
+        var alertText, eventDate, eventResolved, eventType;
+        eventDate = $filter('date')(message.timestamp, 'MMM d h:mm a');
+        eventResolved = message.sensorEventEnd !== 0;
+        if (eventResolved) {
+          eventType = message.sensorEventEnd;
+        } else {
+          eventType = message.sensorEventStart;
+        }
+        alertText = (function() {
+          switch (eventType) {
+            case 1:
+              return '<i class="icon ion-waterdrop"></i> Water detect';
+            case 2:
+              return '<i class="icon ion-eye"></i> Motion detect';
+            case 3:
+              return '<i class="icon ion-thermometer"></i> Low temperature';
+            case 4:
+              return '<i class="icon ion-thermometer"></i> High temperature';
+            case 5:
+              return '<i class="icon ion-ios-rainy"></i> Low humidity';
+            case 6:
+              return '<i class="icon ion-ios-rainy"></i> High humidity';
+            case 7:
+              return '<i class="icon ion-lightbulb"></i> Low light';
+            case 8:
+              return '<i class="icon ion-lightbulb"></i> High light';
+            case 9:
+              return '<i class="icon ion-reply-all"></i> Movement';
+          }
+        })();
+        if (eventResolved) {
+          alertText += ' resolved';
+        }
+        alertText += " <span class='small-text'>" + eventDate + "</span>";
+        if (eventType === 1) {
+          alertText = '<span class="red">' + alertText + '</span>';
+        }
+        return alertText;
+      }
+    };
+  });
+
+  services.factory('alert', function($resource) {
+    return $resource(baseUrl + '/search', {
+      msgType: 4,
+      start: "'12 hours ago'"
+    }, {
+      query: {
+        method: 'GET',
+        params: {},
+        isArray: true,
+        transformResponse: function(data, header) {
+          var jsonData;
+          jsonData = JSON.parse(data);
+          jsonData.pop();
+          return jsonData;
+        }
+      }
+    });
+  });
+
 }).call(this);

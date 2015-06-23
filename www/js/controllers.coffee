@@ -1,25 +1,39 @@
 
-app = angular.module "hcMobile.controllers", []
-
-
+app     = angular.module "hcMobile.controllers", ['ngSanitize']
 baseUrl = 'http://homeclub.us/api'
 
 
+app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
+  $scope.alerttext = alerttext
 
-app.controller("DashCtrl", ($scope, latest, SessionFactory) ->
   $scope.currentUser = SessionFactory.getSession()
 
   $scope.refreshLatest = ->
+
     $scope.loading = true
-    latest.get sensorHubMacAddresses:$scope.currentUser.gateways[0].sensorHubs, (data) ->
+
+    latest.get {sensorHubMacAddresses:$scope.currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
       $scope.loading = false
       $scope.latest = data
 
   $scope.refreshLatest()
-)
+
+  $scope.alerts = {}
+
+  $scope.toggleAlerts = ( sensorHubMacAddress ) ->
+    if $scope.alerts[sensorHubMacAddress]
+      $scope.alerts[sensorHubMacAddress] = undefined
+    else
+      alert.query sensorHubMacAddress:sensorHubMacAddress, ( alerts ) ->
+        $scope.alerts[sensorHubMacAddress] = alerts
+
+  $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress].latestAlert != undefined
+  $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress].latestAlert == undefined
+  $scope.showOkIfNoAlerts = ( roomName ) ->
+    roomName == 'Water Detect' || roomName == 'Human Motion' || roomName == 'Item Movement'
 
 
-app.controller('SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) ->
+app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) ->
   $scope.currentUser = SessionFactory.getSession()
   $scope.customerAccount = new customeraccount(resolvedCustomerAccount.data)
   $scope.meta = meta
@@ -61,12 +75,9 @@ app.controller('SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, Ses
     $scope.customerAccount.$update (customerAccount) ->
       $rootScope.toast 'Saved'
 
-)
 
-
-app.controller('SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) ->
+app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) ->
   $scope.login = (user) ->
-    console.log '..logging in'
     $rootScope.showLoading "Authenticating.."
     AuthFactory
       .login(user)
@@ -80,12 +91,6 @@ app.controller('SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, Se
 
           sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
             SessionFactory.setRoomNames sensorHubs
-#            currentUser.roomNamesBySensorHubMacAddress = {}
-#            sensorHubs.forEach (sensorHub) ->
-#              name = meta.roomTypes[sensorHub.roomType] || meta.sensorHubTypes[String(sensorHub.sensorHubType)]
-#              @[sensorHub._id] = name
-#            , currentUser.roomNamesBySensorHubMacAddress
-#            SessionFactory.createSession(currentUser)
             $state.go 'app.dash'
             $rootScope.hideLoading()
           )
@@ -95,7 +100,5 @@ app.controller('SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, Se
         $rootScope.toast 'Invalid Credentials'
       )
 
-  if localStorage.userCredentials
+  if !localStorage.user && localStorage.userCredentials
     $scope.login JSON.parse( localStorage.userCredentials )
-
-)

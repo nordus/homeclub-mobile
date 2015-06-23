@@ -47,8 +47,6 @@ angular.module("hcMobile", [
           controller: 'SignInCtrl'
     )
 
-  defaultRoute
-
   $urlRouterProvider.otherwise '/login'
 
 ]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory) ->

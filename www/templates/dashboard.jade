@@ -1,4 +1,4 @@
-ion-view(view-title='Dashboard')
+ion-view#dashboard(view-title='Dashboard')
 
   ion-nav-buttons(side='left')
     button(menu-toggle='left').button.button-icon.icon.ion-navicon
@@ -18,6 +18,22 @@ ion-view(view-title='Dashboard')
           span(style='color:#4f9fcf; padding-right:2px')
             |  {{ latest[sensorHubMacAddress].sensorHubData1 }} ℉
           |  {{ latest[sensorHubMacAddress].timestamp | date:'MMM d h:mm a' }}
+
+      .item.ok(ng-if="noAlert( sensorHubMacAddress ) && showOkIfNoAlerts( roomName )")
+        button.button.button-clear.button-small.button-balanced.button-icon.ion-checkmark  OK
+
+      .item.item-icon-left.alert(ng-click='toggleAlerts( sensorHubMacAddress )', ng-if='hasAlert( sensorHubMacAddress )', ng-bind-html='alerttext.sensorHubEvent(latest[sensorHubMacAddress].latestAlert)')
+
+      .item.ok(ng-if='hasAlert( sensorHubMacAddress )', style='top:-8px')
+        button.button.button-clear.button-small.button-positive.button-icon(ng-click='toggleAlerts( sensorHubMacAddress )')
+          span(ng-show='alerts[sensorHubMacAddress] == undefined')
+            i.ion-arrow-right-b
+            |  show last 12 hours
+          span(ng-show='alerts[sensorHubMacAddress] != undefined')
+            i.ion-arrow-down-b
+            |  hide last 12 hours
+
+      .item.item-icon-left.alert(ng-repeat="alert in alerts[sensorHubMacAddress] | orderBy:'-timestamp'", ng-bind-html='alerttext.sensorHubEvent( alert )')
 
       .item.item-icon-left(ng-show='latest[sensorHubMacAddress].sensorHubData2 != undefined')
         i.icon.ion-lightbulb

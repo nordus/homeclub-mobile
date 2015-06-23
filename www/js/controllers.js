@@ -3,22 +3,45 @@
   var app, baseUrl,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  app = angular.module("hcMobile.controllers", []);
+  app = angular.module("hcMobile.controllers", ['ngSanitize']);
 
   baseUrl = 'http://homeclub.us/api';
 
-  app.controller("DashCtrl", function($scope, latest, SessionFactory) {
+  app.controller('DashCtrl', function($scope, alert, alerttext, latest, SessionFactory) {
+    $scope.alerttext = alerttext;
     $scope.currentUser = SessionFactory.getSession();
     $scope.refreshLatest = function() {
       $scope.loading = true;
       return latest.get({
-        sensorHubMacAddresses: $scope.currentUser.gateways[0].sensorHubs
+        sensorHubMacAddresses: $scope.currentUser.gateways[0].sensorHubs,
+        start: "'12 hours ago'"
       }, function(data) {
         $scope.loading = false;
         return $scope.latest = data;
       });
     };
-    return $scope.refreshLatest();
+    $scope.refreshLatest();
+    $scope.alerts = {};
+    $scope.toggleAlerts = function(sensorHubMacAddress) {
+      if ($scope.alerts[sensorHubMacAddress]) {
+        return $scope.alerts[sensorHubMacAddress] = void 0;
+      } else {
+        return alert.query({
+          sensorHubMacAddress: sensorHubMacAddress
+        }, function(alerts) {
+          return $scope.alerts[sensorHubMacAddress] = alerts;
+        });
+      }
+    };
+    $scope.hasAlert = function(sensorHubMacAddress) {
+      return $scope.latest[sensorHubMacAddress].latestAlert !== void 0;
+    };
+    $scope.noAlert = function(sensorHubMacAddress) {
+      return $scope.latest[sensorHubMacAddress].latestAlert === void 0;
+    };
+    return $scope.showOkIfNoAlerts = function(roomName) {
+      return roomName === 'Water Detect' || roomName === 'Human Motion' || roomName === 'Item Movement';
+    };
   });
 
   app.controller('SensorSetupCtrl', function($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) {
@@ -70,7 +93,6 @@
 
   app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) {
     $scope.login = function(user) {
-      console.log('..logging in');
       $rootScope.showLoading("Authenticating..");
       return AuthFactory.login(user).success(function(data) {
         localStorage.userCredentials = JSON.stringify(user);
@@ -89,7 +111,7 @@
         return $rootScope.toast('Invalid Credentials');
       });
     };
-    if (localStorage.userCredentials) {
+    if (!localStorage.user && localStorage.userCredentials) {
       return $scope.login(JSON.parse(localStorage.userCredentials));
     }
   });
