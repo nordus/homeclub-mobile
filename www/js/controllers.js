@@ -17,6 +17,7 @@
         start: "'12 hours ago'"
       }, function(data) {
         $scope.loading = false;
+        $scope.$broadcast('scroll.refreshComplete');
         return $scope.latest = data;
       });
     };

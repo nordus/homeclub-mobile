@@ -126,6 +126,7 @@ services.factory 'alerttext', ( $filter ) ->
     if eventResolved
       alertText += ' resolved'
     alertText += " <span class='small-text'>#{eventDate}</span>"
+    # water alert text should be red
     if eventType is 1
       alertText = '<span class="red">' + alertText + '</span>'
     alertText

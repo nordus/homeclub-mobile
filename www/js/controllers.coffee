@@ -14,6 +14,7 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
     latest.get {sensorHubMacAddresses:$scope.currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
       $scope.loading = false
+      $scope.$broadcast 'scroll.refreshComplete'
       $scope.latest = data
 
   $scope.refreshLatest()

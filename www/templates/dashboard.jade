@@ -10,6 +10,7 @@ ion-view#dashboard(view-title='Dashboard')
         ion-spinner
 
   ion-content.has-header
+    ion-refresher(on-refresh='refreshLatest()')
     .card(ng-repeat='(sensorHubMacAddress, roomName) in currentUser.roomNamesBySensorHubMacAddress')
 
       .item.item-divider
