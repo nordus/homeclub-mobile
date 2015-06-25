@@ -18,6 +18,15 @@
     "com.ionic.keyboard"
   ],
   "cordovaPlatforms": [
-    "ios"
+    {
+      "platform": "android",
+      "version": "4.0.x",
+      "locator": "android@4.0.x"
+    },
+    {
+      "platform": "ios",
+      "version": "4.0.x",
+      "locator": "ios@4.0.x"
+    }
   ]
 }
