@@ -45,22 +45,24 @@
     }
   };
 
-  services.factory('SessionFactory', function($window, $ionicPlatform) {
+  services.factory('SessionFactory', function($window, $ionicPlatform, $timeout) {
     var _sessionFactory;
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
       $window.localStorage.user = JSON.stringify(user);
       return $ionicPlatform.ready(function() {
-        if (analytics) {
-          console.log('.. startTrackerWithId()');
-          analytics.startTrackerWithId('UA-50394594-4');
-          analytics.setUserId(user._id);
-          analytics.addCustomDimension('dimension1', user._id);
-          analytics.addCustomDimension('dimension2', user.carrier);
-          return analytics.trackView('/login');
-        } else {
-          return console.log('.. could not set Google Analytics custom dimensions :( ');
-        }
+        return $timeout(function() {
+          if (analytics) {
+            console.log('.. startTrackerWithId()');
+            analytics.startTrackerWithId('UA-50394594-4');
+            analytics.setUserId(user._id);
+            analytics.addCustomDimension('dimension1', user._id);
+            analytics.addCustomDimension('dimension2', user.carrier);
+            return analytics.trackView('/login');
+          } else {
+            return console.log('.. could not set Google Analytics custom dimensions :( ');
+          }
+        }, 2000);
       });
     };
     _sessionFactory.getSession = function() {
