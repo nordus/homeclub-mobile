@@ -8,7 +8,7 @@
   baseUrl = 'http://homeclub.us/api';
 
   app.controller('DashCtrl', function($scope, alert, alerttext, latest, SessionFactory) {
-    if (analytics) {
+    if (typeof analytics !== "undefined" && analytics !== null) {
       analytics.trackView('/dashboard');
     }
     $scope.alerttext = alerttext;
@@ -50,7 +50,7 @@
 
   app.controller('SensorSetupCtrl', function($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) {
     var sensorTypesBySensorHubTypeId;
-    if (analytics) {
+    if (typeof analytics !== "undefined" && analytics !== null) {
       analytics.trackView('/sensors');
     }
     $scope.currentUser = SessionFactory.getSession();

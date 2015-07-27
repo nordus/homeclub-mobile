@@ -51,8 +51,11 @@
     _sessionFactory.createSession = function(user) {
       $window.localStorage.user = JSON.stringify(user);
       if (analytics) {
+        analytics.startTrackerWithId('UA-50394594-4');
+        analytics.setUserId(user._id);
         analytics.addCustomDimension('dimension1', user._id);
-        return analytics.addCustomDimension('dimension2', user.carrier);
+        analytics.addCustomDimension('dimension2', user.carrier);
+        return analytics.trackView('/login');
       } else {
         return console.log('.. could not set Google Analytics custom dimensions :( ');
       }
