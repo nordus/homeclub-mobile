@@ -9,7 +9,7 @@
 
   app.controller('DashCtrl', function($scope, alert, alerttext, latest, SessionFactory) {
     if (analytics) {
-      analytics.trackview('/dashboard');
+      analytics.trackView('/dashboard');
     }
     $scope.alerttext = alerttext;
     $scope.currentUser = SessionFactory.getSession();

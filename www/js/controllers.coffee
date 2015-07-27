@@ -6,7 +6,7 @@ baseUrl = 'http://homeclub.us/api'
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
   if analytics
-    analytics.trackview '/dashboard'
+    analytics.trackView '/dashboard'
 
   $scope.alerttext = alerttext
 
