@@ -39,7 +39,7 @@ meta = {
   }
 }
 
-services.factory('SessionFactory', ($window) ->
+services.factory('SessionFactory', ($window, $ionicPlatform) ->
   _sessionFactory = {}
 
   _sessionFactory.createSession = (user) ->

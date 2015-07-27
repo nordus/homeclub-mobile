@@ -45,7 +45,7 @@
     }
   };
 
-  services.factory('SessionFactory', function($window) {
+  services.factory('SessionFactory', function($window, $ionicPlatform) {
     var _sessionFactory;
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
