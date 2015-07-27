@@ -53,6 +53,12 @@
   ]).run(function($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory) {
     $ionicPlatform.ready(function() {
       var pushNotification, token;
+      if (analytics) {
+        analytics.debugMode();
+        analytics.startTrackerWithId('UA-50394594-4');
+      } else {
+        console.log('.. Google Analytics unavailable :( ');
+      }
       pushNotification = window.plugins.pushNotification;
       if (ionic.Platform.isAndroid()) {
         token = localStorage.getItem('Android_token');

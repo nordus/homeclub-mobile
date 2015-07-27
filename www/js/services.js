@@ -49,7 +49,13 @@
     var _sessionFactory;
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
-      return $window.localStorage.user = JSON.stringify(user);
+      $window.localStorage.user = JSON.stringify(user);
+      if (analytics) {
+        analytics.addCustomDimension('dimension1', user._id);
+        return analytics.addCustomDimension('dimension2', user.carrier);
+      } else {
+        return console.log('.. could not set Google Analytics custom dimensions :( ');
+      }
     };
     _sessionFactory.getSession = function() {
       return JSON.parse($window.localStorage.user);

@@ -44,6 +44,11 @@ services.factory('SessionFactory', ($window) ->
 
   _sessionFactory.createSession = (user) ->
     $window.localStorage.user = JSON.stringify(user)
+    if analytics
+      analytics.addCustomDimension 'dimension1', user._id
+      analytics.addCustomDimension 'dimension2', user.carrier
+    else
+      console.log '.. could not set Google Analytics custom dimensions :( '
 
   _sessionFactory.getSession = ->
     JSON.parse($window.localStorage.user)

@@ -52,6 +52,12 @@ angular.module("hcMobile", [
 ]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory) ->
   $ionicPlatform.ready ->
 
+    if analytics
+      analytics.debugMode()
+      analytics.startTrackerWithId 'UA-50394594-4'
+    else
+      console.log '.. Google Analytics unavailable :( '
+
     pushNotification = window.plugins.pushNotification
 
     # register with APN/GCM, then send token to alerts server
