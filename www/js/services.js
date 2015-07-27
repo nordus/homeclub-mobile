@@ -50,15 +50,18 @@
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
       $window.localStorage.user = JSON.stringify(user);
-      if (analytics) {
-        analytics.startTrackerWithId('UA-50394594-4');
-        analytics.setUserId(user._id);
-        analytics.addCustomDimension('dimension1', user._id);
-        analytics.addCustomDimension('dimension2', user.carrier);
-        return analytics.trackView('/login');
-      } else {
-        return console.log('.. could not set Google Analytics custom dimensions :( ');
-      }
+      return $ionicPlatform.ready(function() {
+        if (analytics) {
+          console.log('.. startTrackerWithId()');
+          analytics.startTrackerWithId('UA-50394594-4');
+          analytics.setUserId(user._id);
+          analytics.addCustomDimension('dimension1', user._id);
+          analytics.addCustomDimension('dimension2', user.carrier);
+          return analytics.trackView('/login');
+        } else {
+          return console.log('.. could not set Google Analytics custom dimensions :( ');
+        }
+      });
     };
     _sessionFactory.getSession = function() {
       return JSON.parse($window.localStorage.user);

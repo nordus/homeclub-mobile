@@ -44,14 +44,16 @@ services.factory('SessionFactory', ($window) ->
 
   _sessionFactory.createSession = (user) ->
     $window.localStorage.user = JSON.stringify(user)
-    if analytics
-      analytics.startTrackerWithId 'UA-50394594-4'
-      analytics.setUserId user._id
-      analytics.addCustomDimension 'dimension1', user._id
-      analytics.addCustomDimension 'dimension2', user.carrier
-      analytics.trackView '/login'
-    else
-      console.log '.. could not set Google Analytics custom dimensions :( '
+    $ionicPlatform.ready ->
+      if analytics
+        console.log '.. startTrackerWithId()'
+        analytics.startTrackerWithId 'UA-50394594-4'
+        analytics.setUserId user._id
+        analytics.addCustomDimension 'dimension1', user._id
+        analytics.addCustomDimension 'dimension2', user.carrier
+        analytics.trackView '/login'
+      else
+        console.log '.. could not set Google Analytics custom dimensions :( '
 
   _sessionFactory.getSession = ->
     JSON.parse($window.localStorage.user)
