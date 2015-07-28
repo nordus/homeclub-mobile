@@ -1,4 +1,4 @@
-services = angular.module 'hcMobile.services', []
+services = angular.module 'hcMobile.services', ['ngCordova']
 baseUrl = 'http://homeclub.us/api'
 meta = {
   "sensorHubTypes": {
@@ -39,20 +39,21 @@ meta = {
   }
 }
 
-services.factory('SessionFactory', ($window, $ionicPlatform, $timeout) ->
+services.factory('SessionFactory', ($window, $ionicPlatform, $timeout, $cordovaDevice) ->
   _sessionFactory = {}
 
   _sessionFactory.createSession = (user) ->
     $window.localStorage.user = JSON.stringify(user)
-    if $window.ga
+    ionic.Platform.ready ->
 
-      console.log '.. $window.ga exists'
+      if $window.ga != undefined
+        console.log '.. $window.ga exists'
 
       ua = 'UA-50394594-4'
 
       ga 'create', ua,
         storage   : 'none'
-        clientId  : device.uuid
+        clientId  : $cordovaDevice.getUUID()
         userId    : user._id
 
       ga 'set',

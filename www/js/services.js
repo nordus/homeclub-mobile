@@ -45,7 +45,7 @@
     }
   };
 
-  services.factory('SessionFactory', function($window, $ionicPlatform, $timeout) {
+  services.factory('SessionFactory', function($window, $ionicPlatform, $timeout, $cordovaDevice) {
     var _sessionFactory;
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
@@ -56,7 +56,7 @@
         ua = 'UA-50394594-4';
         ga('create', ua, {
           storage: 'none',
-          clientId: device.uuid,
+          clientId: $cordovaDevice.getUUID(),
           userId: user._id
         });
         ga('set', {
