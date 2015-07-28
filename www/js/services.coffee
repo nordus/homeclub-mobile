@@ -1,4 +1,4 @@
-services = angular.module 'hcMobile.services', ['ngCordova']
+services = angular.module 'hcMobile.services', []
 baseUrl = 'http://homeclub.us/api'
 meta = {
   "sensorHubTypes": {
@@ -39,33 +39,11 @@ meta = {
   }
 }
 
-services.factory('SessionFactory', ($window, $ionicPlatform, $timeout, $cordovaDevice) ->
+services.factory('SessionFactory', ($window, $ionicPlatform, $timeout) ->
   _sessionFactory = {}
 
   _sessionFactory.createSession = (user) ->
     $window.localStorage.user = JSON.stringify(user)
-    ionic.Platform.ready ->
-
-      if $window.ga != undefined
-        console.log '.. $window.ga exists'
-
-      ua = 'UA-50394594-4'
-
-      ga 'create', ua,
-        storage   : 'none'
-        clientId  : $cordovaDevice.getUUID()
-        userId    : user._id
-
-      ga 'set',
-        checkProtocolTask : null
-        checkStorageTask  : null
-        dimension1        : user._id
-        dimension2        : user.carrier
-
-      ga 'send', 'pageview', '/login'
-
-    else
-      console.log '.. could not set Google Analytics custom dimensions :( '
 
   _sessionFactory.getSession = ->
     JSON.parse($window.localStorage.user)

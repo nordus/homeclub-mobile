@@ -3,7 +3,7 @@
   var app, baseUrl,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  app = angular.module("hcMobile.controllers", ['ngSanitize']);
+  app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova']);
 
   baseUrl = 'http://homeclub.us/api';
 
@@ -94,12 +94,29 @@
     };
   });
 
-  app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) {
+  app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaDevice) {
     $scope.login = function(user) {
       $rootScope.showLoading("Authenticating..");
       return AuthFactory.login(user).success(function(data) {
         localStorage.userCredentials = JSON.stringify(user);
         return $http.get(baseUrl + '/me/customer-account').success(function(currentUser) {
+          var ua;
+          if ($window.ga !== void 0) {
+            console.log('.. $window.ga exists');
+            ua = 'UA-50394594-4';
+            ga('create', ua, {
+              storage: 'none',
+              clientId: $cordovaDevice.getUUID(),
+              userId: user._id
+            });
+            ga('set', {
+              checkProtocolTask: null,
+              checkStorageTask: null,
+              dimension1: user._id,
+              dimension2: user.carrier
+            });
+            ga('send', 'pageview', '/login');
+          }
           SessionFactory.createSession(currentUser);
           return sensorhub.query({
             sensorHubMacAddresses: currentUser.gateways[0].sensorHubs

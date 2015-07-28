@@ -1,5 +1,5 @@
 
-app     = angular.module "hcMobile.controllers", ['ngSanitize']
+app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova']
 baseUrl = 'http://homeclub.us/api'
 
 
@@ -83,7 +83,7 @@ app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, Ses
       $rootScope.toast 'Saved'
 
 
-app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta) ->
+app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaDevice) ->
   $scope.login = (user) ->
     $rootScope.showLoading "Authenticating.."
     AuthFactory
@@ -93,6 +93,26 @@ app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, Se
         localStorage.userCredentials = JSON.stringify user
 
         $http.get(baseUrl+'/me/customer-account').success((currentUser) ->
+
+
+          if $window.ga != undefined
+            console.log '.. $window.ga exists'
+
+            ua = 'UA-50394594-4'
+
+            ga 'create', ua,
+              storage   : 'none'
+              clientId  : $cordovaDevice.getUUID()
+              userId    : user._id
+
+            ga 'set',
+              checkProtocolTask : null
+              checkStorageTask  : null
+              dimension1        : user._id
+              dimension2        : user.carrier
+
+            ga 'send', 'pageview', '/login'
+
 
           SessionFactory.createSession(currentUser)
 

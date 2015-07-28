@@ -45,30 +45,11 @@
     }
   };
 
-  services.factory('SessionFactory', function($window, $ionicPlatform, $timeout, $cordovaDevice) {
+  services.factory('SessionFactory', function($window, $ionicPlatform, $timeout) {
     var _sessionFactory;
     _sessionFactory = {};
     _sessionFactory.createSession = function(user) {
-      var ua;
-      $window.localStorage.user = JSON.stringify(user);
-      if ($window.ga) {
-        console.log('.. $window.ga exists');
-        ua = 'UA-50394594-4';
-        ga('create', ua, {
-          storage: 'none',
-          clientId: $cordovaDevice.getUUID(),
-          userId: user._id
-        });
-        ga('set', {
-          checkProtocolTask: null,
-          checkStorageTask: null,
-          dimension1: user._id,
-          dimension2: user.carrier
-        });
-        return ga('send', 'pageview', '/login');
-      } else {
-        return console.log('.. could not set Google Analytics custom dimensions :( ');
-      }
+      return $window.localStorage.user = JSON.stringify(user);
     };
     _sessionFactory.getSession = function() {
       return JSON.parse($window.localStorage.user);
