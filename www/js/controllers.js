@@ -8,7 +8,9 @@
   baseUrl = 'http://homeclub.us/api';
 
   app.controller('DashCtrl', function($scope, alert, alerttext, latest, SessionFactory) {
-    ga('send', 'pageview', '/dashboard');
+    ga('send', 'screenview', {
+      screenName: '/dashboard'
+    });
     $scope.alerttext = alerttext;
     $scope.currentUser = SessionFactory.getSession();
     $scope.refreshLatest = function() {
@@ -48,7 +50,9 @@
 
   app.controller('SensorSetupCtrl', function($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) {
     var sensorTypesBySensorHubTypeId;
-    ga('send', 'pageview', '/sensors');
+    ga('send', 'screenview', {
+      screenName: '/sensors'
+    });
     $scope.currentUser = SessionFactory.getSession();
     $scope.customerAccount = new customeraccount(resolvedCustomerAccount.data);
     $scope.meta = meta;
@@ -94,36 +98,36 @@
     };
   });
 
-  app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaDevice) {
-    $scope.login = function(user) {
+  app.controller('SignInCtrl', function($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaAppVersion, $cordovaDevice) {
+    return $scope.login = function(user) {
       $rootScope.showLoading("Authenticating..");
       return AuthFactory.login(user).success(function(data) {
-        localStorage.userCredentials = JSON.stringify(user);
         return $http.get(baseUrl + '/me/customer-account').success(function(currentUser) {
-          var ua;
-          if ($window.ga !== void 0) {
-            console.log('.. $window.ga exists');
-            ua = 'UA-50394594-4';
-            ga('create', ua, {
-              storage: 'none',
-              clientId: $cordovaDevice.getUUID(),
-              userId: user._id
+          return ionic.Platform.ready(function() {
+            return $cordovaAppVersion.getAppVersion().then(function(version) {
+              currentUser.uuid = $cordovaDevice.getUUID();
+              ga('create', 'UA-50394594-4', {
+                storage: 'none',
+                clientId: currentUser.uuid,
+                userId: currentUser._id
+              });
+              ga('set', {
+                appName: 'HomeClub Mobile',
+                appVersion: version,
+                checkProtocolTask: null,
+                checkStorageTask: null,
+                dimension1: currentUser._id,
+                dimension2: currentUser.carrier
+              });
+              SessionFactory.createSession(currentUser);
+              return sensorhub.query({
+                sensorHubMacAddresses: currentUser.gateways[0].sensorHubs
+              }, function(sensorHubs) {
+                SessionFactory.setRoomNames(sensorHubs);
+                $state.go('app.dash');
+                return $rootScope.hideLoading();
+              });
             });
-            ga('set', {
-              checkProtocolTask: null,
-              checkStorageTask: null,
-              dimension1: user._id,
-              dimension2: user.carrier
-            });
-            ga('send', 'pageview', '/login');
-          }
-          SessionFactory.createSession(currentUser);
-          return sensorhub.query({
-            sensorHubMacAddresses: currentUser.gateways[0].sensorHubs
-          }, function(sensorHubs) {
-            SessionFactory.setRoomNames(sensorHubs);
-            $state.go('app.dash');
-            return $rootScope.hideLoading();
           });
         });
       }).error(function(data) {
@@ -131,9 +135,6 @@
         return $rootScope.toast('Invalid Credentials');
       });
     };
-    if (!localStorage.user && localStorage.userCredentials) {
-      return $scope.login(JSON.parse(localStorage.userCredentials));
-    }
   });
 
 }).call(this);

@@ -5,7 +5,7 @@ baseUrl = 'http://homeclub.us/api'
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
-  ga 'send', 'pageview', '/dashboard'
+  ga 'send', 'screenview', screenName:'/dashboard'
 
   $scope.alerttext = alerttext
 
@@ -39,7 +39,7 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
 app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) ->
 
-  ga 'send', 'pageview', '/sensors'
+  ga 'send', 'screenview', screenName:'/sensors'
 
   $scope.currentUser = SessionFactory.getSession()
   $scope.customerAccount = new customeraccount(resolvedCustomerAccount.data)
@@ -83,49 +83,43 @@ app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, Ses
       $rootScope.toast 'Saved'
 
 
-app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaDevice) ->
+app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaAppVersion, $cordovaDevice) ->
   $scope.login = (user) ->
     $rootScope.showLoading "Authenticating.."
     AuthFactory
       .login(user)
       .success((data) ->
 
-        localStorage.userCredentials = JSON.stringify user
-
         $http.get(baseUrl+'/me/customer-account').success((currentUser) ->
 
+          ionic.Platform.ready ->
 
-          if $window.ga != undefined
-            console.log '.. $window.ga exists'
+            $cordovaAppVersion.getAppVersion().then ( version ) ->
 
-            ua = 'UA-50394594-4'
+              currentUser.uuid = $cordovaDevice.getUUID()
 
-            ga 'create', ua,
-              storage   : 'none'
-              clientId  : $cordovaDevice.getUUID()
-              userId    : user._id
+              ga 'create', 'UA-50394594-4',
+                storage           : 'none'
+                clientId          : currentUser.uuid
+                userId            : currentUser._id
 
-            ga 'set',
-              checkProtocolTask : null
-              checkStorageTask  : null
-              dimension1        : user._id
-              dimension2        : user.carrier
+              ga 'set',
+                appName           : 'HomeClub Mobile'
+                appVersion        : version
+                checkProtocolTask : null
+                checkStorageTask  : null
+                dimension1        : currentUser._id
+                dimension2        : currentUser.carrier
 
-            ga 'send', 'pageview', '/login'
+              SessionFactory.createSession(currentUser)
 
-
-          SessionFactory.createSession(currentUser)
-
-          sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
-            SessionFactory.setRoomNames sensorHubs
-            $state.go 'app.dash'
-            $rootScope.hideLoading()
-          )
+              sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
+                SessionFactory.setRoomNames sensorHubs
+                $state.go 'app.dash'
+                $rootScope.hideLoading()
+              )
         )
       ).error((data) ->
         $rootScope.hideLoading()
         $rootScope.toast 'Invalid Credentials'
       )
-
-  if !localStorage.user && localStorage.userCredentials
-    $scope.login JSON.parse( localStorage.userCredentials )
