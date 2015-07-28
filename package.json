@@ -15,7 +15,12 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
-    "com.ionic.keyboard"
+    "com.ionic.keyboard",
+    {
+      "locator": "https://github.com/whiteoctober/cordova-plugin-app-version.git",
+      "id": "uk.co.whiteoctober.cordova.appversion"
+    },
+    "cordova-plugin-device"
   ],
   "cordovaPlatforms": [
     {
@@ -27,6 +32,7 @@
       "platform": "ios",
       "version": "4.0.x",
       "locator": "ios@4.0.x"
-    }
+    },
+    "android"
   ]
 }
