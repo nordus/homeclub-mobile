@@ -44,18 +44,27 @@ services.factory('SessionFactory', ($window, $ionicPlatform, $timeout) ->
 
   _sessionFactory.createSession = (user) ->
     $window.localStorage.user = JSON.stringify(user)
-    $ionicPlatform.ready ->
-      $timeout ->
-        if analytics
-          console.log '.. startTrackerWithId()'
-          analytics.startTrackerWithId 'UA-50394594-4'
-          analytics.setUserId user._id
-          analytics.addCustomDimension 'dimension1', user._id
-          analytics.addCustomDimension 'dimension2', user.carrier
-          analytics.trackView '/login'
-        else
-          console.log '.. could not set Google Analytics custom dimensions :( '
-      , 2000
+    if $window.ga
+
+      console.log '.. $window.ga exists'
+
+      ua = 'UA-50394594-4'
+
+      ga 'create', ua,
+        storage   : 'none'
+        clientId  : device.uuid
+        userId    : user._id
+
+      ga 'set',
+        checkProtocolTask : null
+        checkStorageTask  : null
+        dimension1        : user._id
+        dimension2        : user.carrier
+
+      ga 'send', 'pageview', '/login'
+
+    else
+      console.log '.. could not set Google Analytics custom dimensions :( '
 
   _sessionFactory.getSession = ->
     JSON.parse($window.localStorage.user)

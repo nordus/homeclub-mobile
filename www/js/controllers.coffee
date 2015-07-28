@@ -5,7 +5,7 @@ baseUrl = 'http://homeclub.us/api'
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
-  analytics?.trackView '/dashboard'
+  ga 'send', 'pageview', '/dashboard'
 
   $scope.alerttext = alerttext
 
@@ -39,7 +39,7 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
 
 app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) ->
 
-  analytics?.trackView '/sensors'
+  ga 'send', 'pageview', '/sensors'
 
   $scope.currentUser = SessionFactory.getSession()
   $scope.customerAccount = new customeraccount(resolvedCustomerAccount.data)
