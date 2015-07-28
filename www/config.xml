@@ -67,8 +67,8 @@
   <content src="index.html"/>
 
   <access origin="*"/>
-  <allow-intent href="*"/>
-  <allow-navigation href="*"/>
+  <!--<allow-intent href="*"/>-->
+  <!--<allow-navigation href="*"/>-->
 
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
