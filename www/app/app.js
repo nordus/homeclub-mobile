@@ -74,9 +74,6 @@
           });
         }
       }
-      if (window.cordova && window.cordova.plugins.Keyboard) {
-        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      }
       if (window.StatusBar) {
         return StatusBar.styleDefault();
       }

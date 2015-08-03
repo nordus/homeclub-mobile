@@ -74,8 +74,8 @@ angular.module("hcMobile", [
 
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     # for form inputs)
-    if window.cordova and window.cordova.plugins.Keyboard
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
+#    if window.cordova and window.cordova.plugins.Keyboard
+#      cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
 
     # org.apache.cordova.statusbar required
     StatusBar.styleDefault()  if window.StatusBar
