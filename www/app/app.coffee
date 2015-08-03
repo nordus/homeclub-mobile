@@ -78,7 +78,8 @@ angular.module("hcMobile", [
 #      cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
 
     # org.apache.cordova.statusbar required
-    StatusBar.styleDefault()  if window.StatusBar
+#    StatusBar.styleDefault()  if window.StatusBar
+    StatusBar.backgroundColorByHexString('#6cc6c6')  if window.StatusBar
 
   $rootScope.showLoading = (msg) ->
     $ionicLoading.show

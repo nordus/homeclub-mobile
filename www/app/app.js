@@ -75,7 +75,7 @@
         }
       }
       if (window.StatusBar) {
-        return StatusBar.styleDefault();
+        return StatusBar.backgroundColorByHexString('#6cc6c6');
       }
     });
     $rootScope.showLoading = function(msg) {
