@@ -1,55 +1,60 @@
 
-if window.cordova or location.hostname is 'localhost'
-  baseUrl = 'http://homeclub.us/api'
-else
-  baseUrl = '/api'
-
-
 angular.module("hcMobile", [
   "ionic"
   'ngResource'
   'ionic.service.core'
 #  'ionic.service.push'
 #  'ionic.service.deploy'
+
+  'shared'
+
   "hcMobile.controllers"
   "hcMobile.services"
-]).config(['$stateProvider', '$urlRouterProvider', '$ionicAppProvider', ($stateProvider, $urlRouterProvider, $ionicAppProvider) ->
+]).config([
+  '$stateProvider'
+  '$urlRouterProvider'
+  '$ionicAppProvider'
+  'BASE_URL'
+  '$httpProvider'
+  ($stateProvider, $urlRouterProvider, $ionicAppProvider, BASE_URL, $httpProvider) ->
 
-  $ionicAppProvider.identify
-    app_id: '627f4314'
-    api_key: '08802936b07eeb891a3cad5efc08cb59252541816f75aa8d'
+    $httpProvider.interceptors.push 'AuthInterceptor'
 
-  $stateProvider
-    .state('app',
-      url: '/app'
-      templateUrl: 'app/layout/menu-layout.html'
-      abstract: true
-    ).state('app.dash',
-      url: '/dash'
-      views:
-        mainContent:
-          templateUrl: 'templates/dashboard.html'
-          controller: 'DashCtrl'
-    ).state('app.sensorSetup',
-      resolve:
-        resolvedCustomerAccount: ($http) ->
-          $http.get baseUrl+'/me/customer-account'
-      url: '/sensor-setup'
-      views:
-        mainContent:
-          templateUrl: 'templates/sensor-setup.html'
-          controller: 'SensorSetupCtrl'
-    ).state('login',
-      url: '/login'
-      views:
-        '':
-          templateUrl: 'templates/login.html'
-          controller: 'SignInCtrl'
-    )
+    $ionicAppProvider.identify
+      app_id: '627f4314'
+      api_key: '08802936b07eeb891a3cad5efc08cb59252541816f75aa8d'
 
-  $urlRouterProvider.otherwise '/login'
+    $stateProvider
+      .state('app',
+        url: '/app'
+        templateUrl: 'app/layout/menu-layout.html'
+        abstract: true
+      ).state('app.dash',
+        url: '/dash'
+        views:
+          mainContent:
+            templateUrl: 'templates/dashboard.html'
+            controller: 'DashCtrl'
+      ).state('app.sensorSetup',
+        resolve:
+          resolvedCustomerAccount: ($http) ->
+            $http.get BASE_URL+'/me/customer-account'
+        url: '/sensor-setup'
+        views:
+          mainContent:
+            templateUrl: 'templates/sensor-setup.html'
+            controller: 'SensorSetupCtrl'
+      ).state('login',
+        url: '/login'
+        views:
+          '':
+            templateUrl: 'templates/login.html'
+            controller: 'SignInCtrl'
+      )
 
-]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory) ->
+    $urlRouterProvider.otherwise '/login'
+
+]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory, AuthTokenFactory) ->
   $ionicPlatform.ready ->
 
     pushNotification = window.plugins.pushNotification
@@ -71,11 +76,6 @@ angular.module("hcMobile", [
           alert : 'true'
           ecb   : 'pushCallbacks.APN.onNotification'
 
-
-    # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    # for form inputs)
-#    if window.cordova and window.cordova.plugins.Keyboard
-#      cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
 
     # org.apache.cordova.statusbar required
     StatusBar.styleDefault()  if window.StatusBar
@@ -99,6 +99,7 @@ angular.module("hcMobile", [
 
   $rootScope.logout = ->
     SessionFactory.deleteSession()
+    AuthTokenFactory.setToken null
     $state.go 'login'
 
 ).filter 'capitalize', ->

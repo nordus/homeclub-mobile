@@ -1,6 +1,5 @@
 
 app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova']
-baseUrl = 'http://homeclub.us/api'
 
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
@@ -83,41 +82,52 @@ app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, Ses
       $rootScope.toast 'Saved'
 
 
-app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaAppVersion, $cordovaDevice) ->
+app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaAppVersion, $cordovaDevice, BASE_URL, AuthTokenFactory) ->
   $scope.login = (user) ->
     $rootScope.showLoading "Authenticating.."
     AuthFactory
       .login(user)
       .success((data) ->
 
-        $http.get(baseUrl+'/me/customer-account').success((currentUser) ->
+        $http.get(BASE_URL+'/me/customer-account').success(( resp ) ->
 
           ionic.Platform.ready ->
 
-            $cordovaAppVersion.getAppVersion().then ( version ) ->
+            currentUser       = resp.account
 
-              currentUser.uuid = $cordovaDevice.getUUID()
+            currentUser.uuid  = if window.cordova then $cordovaDevice.getUUID() else currentUser._id
 
-              ga 'create', 'UA-50394594-4',
-                storage           : 'none'
-                clientId          : currentUser.uuid
-                userId            : currentUser._id
+            ga 'create', 'UA-50394594-4',
+              storage           : 'none'
+              clientId          : currentUser.uuid
+              userId            : currentUser._id
 
-              ga 'set',
-                appName           : 'HomeClub Mobile'
-                appVersion        : version
-                checkProtocolTask : null
-                checkStorageTask  : null
-                dimension1        : currentUser._id
-                dimension2        : currentUser.carrier
+            analyticsParams =
+              appName           : 'HomeClub Mobile'
+              checkProtocolTask : null
+              checkStorageTask  : null
+              dimension1        : currentUser._id
+              dimension2        : currentUser.carrier
 
-              SessionFactory.createSession(currentUser)
+            setAnalytics    = ->
+              ga 'set', analyticsParams
 
-              sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
-                SessionFactory.setRoomNames sensorHubs
-                $state.go 'app.dash'
-                $rootScope.hideLoading()
-              )
+            if window.cordova
+              $cordovaAppVersion.getAppVersion().then ( version ) ->
+                analyticsParams.appVersion  = version
+                setAnalytics()
+            else
+              setAnalytics()
+
+            SessionFactory.createSession(currentUser)
+
+            AuthTokenFactory.setToken resp.token
+
+            sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
+              SessionFactory.setRoomNames sensorHubs
+              $state.go 'app.dash'
+              $rootScope.hideLoading()
+            )
         )
       ).error((data) ->
         $rootScope.hideLoading()

@@ -1,5 +1,5 @@
 services = angular.module 'hcMobile.services', []
-baseUrl = 'http://homeclub.us/api'
+
 meta = {
   "sensorHubTypes": {
     "1": "Water Detect",
@@ -68,32 +68,32 @@ services.factory('SessionFactory', ($window, $ionicPlatform, $timeout) ->
 )
 
 
-services.factory('AuthFactory', ($http) ->
+services.factory('AuthFactory', ($http, BASE_URL) ->
   _authFactory = {}
 
   _authFactory.login = (user) ->
-    $http.post baseUrl+'/login', user
+    $http.post BASE_URL+'/login', user
 
   _authFactory
 )
 
 
-services.factory('latest', ($resource) ->
+services.factory('latest', ($resource, BASE_URL) ->
 
-  $resource baseUrl+'/latest/sensor-hub-events'
+  $resource BASE_URL+'/latest/sensor-hub-events'
 
 )
 
 
-services.factory('sensorhub', ($resource) ->
+services.factory('sensorhub', ($resource, BASE_URL) ->
 
-  $resource baseUrl+'/sensor-hubs/:id',
+  $resource BASE_URL+'/sensor-hubs/:id',
     id: '@_id'
   ,
     update: { method:'PUT' }
 
-).factory('customeraccount', ($resource) ->
-  $resource baseUrl+'/customer-accounts/:id',
+).factory('customeraccount', ($resource, BASE_URL) ->
+  $resource BASE_URL+'/customer-accounts/:id',
     id: '@_id'
   ,
     update: { method:'PUT' }
@@ -131,8 +131,8 @@ services.factory 'alerttext', ( $filter ) ->
       alertText = '<span class="red">' + alertText + '</span>'
     alertText
 
-services.factory 'alert', ( $resource ) ->
-  $resource baseUrl+'/search',
+services.factory 'alert', ( $resource, BASE_URL ) ->
+  $resource BASE_URL+'/search',
     msgType : 4
     start   : "'12 hours ago'"
   ,
@@ -145,3 +145,28 @@ services.factory 'alert', ( $resource ) ->
         # remove first alert from array as it is already displayed as 'latestAlert'
         jsonData.pop()
         return jsonData
+
+
+services.factory 'AuthTokenFactory', ( $window ) ->
+  store = $window.localStorage
+  key   = 'auth-token'
+
+  getToken  : ->
+    store.getItem( key )
+
+  setToken  : ( token ) ->
+    if token
+      store.setItem( key, token )
+    else
+      store.removeItem( key )
+
+
+services.factory 'AuthInterceptor', ( AuthTokenFactory ) ->
+  request  : ( config ) ->
+    token = AuthTokenFactory.getToken()
+
+    if token
+      config.headers  = config.headers || {}
+      config.headers.Authorization  = "Bearer #{token}"
+
+    return config
