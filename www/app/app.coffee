@@ -52,7 +52,11 @@ angular.module("hcMobile", [
             controller: 'SignInCtrl'
       )
 
-    $urlRouterProvider.otherwise '/login'
+    $urlRouterProvider.otherwise ->
+      if window.localStorage.getItem 'auth-token'
+        return '/app/dash'
+      else
+        return '/login'
 
 ]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory, AuthTokenFactory) ->
   $ionicPlatform.ready ->

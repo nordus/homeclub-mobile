@@ -41,7 +41,13 @@
           }
         }
       });
-      return $urlRouterProvider.otherwise('/login');
+      return $urlRouterProvider.otherwise(function() {
+        if (window.localStorage.getItem('auth-token')) {
+          return '/app/dash';
+        } else {
+          return '/login';
+        }
+      });
     }
   ]).run(function($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory, AuthTokenFactory) {
     $ionicPlatform.ready(function() {
