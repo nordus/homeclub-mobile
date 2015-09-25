@@ -4,7 +4,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "us.homeclub.mobile"
-        version   = "0.0.14">
+        version   = "0.1.0">
 
   <gap:plugin name="uk.co.whiteoctober.cordova.appversion" version="0.1.4" />
 
