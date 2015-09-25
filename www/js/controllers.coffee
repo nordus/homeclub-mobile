@@ -2,24 +2,20 @@
 app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova']
 
 
-app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
+app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser) ->
 
   ga 'send', 'screenview', screenName:'/dashboard'
 
   $scope.alerttext = alerttext
 
-  $scope.currentUser = SessionFactory.getSession()
-
   $scope.refreshLatest = ->
 
     $scope.loading = true
 
-    latest.get {sensorHubMacAddresses:$scope.currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
+    latest.get {sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
       $scope.loading = false
       $scope.$broadcast 'scroll.refreshComplete'
       $scope.latest = data
-
-  $scope.refreshLatest()
 
   $scope.alerts = {}
 
@@ -30,21 +26,22 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, SessionFactory) ->
       alert.query sensorHubMacAddress:sensorHubMacAddress, ( alerts ) ->
         $scope.alerts[sensorHubMacAddress] = alerts
 
-  $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress].latestAlert != undefined
-  $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress].latestAlert == undefined
+  # set $scope.latest before defining methods that depend on it
+  $scope.refreshLatest().$promise.then ->
+    $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert != undefined
+    $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert == undefined
+
   $scope.showOkIfNoAlerts = ( roomName ) ->
-    roomName == 'Water Detect' || roomName == 'Human Motion' || roomName == 'Item Movement'
+    roomName in ['Water Detect', 'Human Motion', 'Item Movement']
 
 
-app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, SessionFactory, $rootScope, resolvedCustomerAccount) ->
+app.controller 'SensorSetupCtrl', ($scope, meta, sensorhub, SessionFactory, $rootScope, currentUser) ->
 
   ga 'send', 'screenview', screenName:'/sensors'
 
-  $scope.currentUser = SessionFactory.getSession()
-  $scope.customerAccount = new customeraccount(resolvedCustomerAccount.data)
   $scope.meta = meta
 
-  sensorhub.query(sensorHubMacAddresses:$scope.currentUser.gateways[0].sensorHubs, (sensorHubs) ->
+  sensorhub.query(sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, (sensorHubs) ->
     $scope.sensorHubs = sensorHubs
   )
 
@@ -78,8 +75,7 @@ app.controller 'SensorSetupCtrl', ($scope, customeraccount, meta, sensorhub, Ses
 
     SessionFactory.setRoomNames $scope.sensorHubs
 
-    $scope.customerAccount.$update (customerAccount) ->
-      $rootScope.toast 'Saved'
+    $rootScope.toast 'Saved'
 
 
 app.controller 'SignInCtrl', ($scope, $state, $http, $rootScope, AuthFactory, SessionFactory, sensorhub, meta, $cordovaAppVersion, $cordovaDevice, BASE_URL, AuthTokenFactory) ->

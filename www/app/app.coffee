@@ -2,55 +2,45 @@
 angular.module("hcMobile", [
   "ionic"
   'ngResource'
-  'ionic.service.core'
-#  'ionic.service.push'
-#  'ionic.service.deploy'
-
   'shared'
-
   "hcMobile.controllers"
   "hcMobile.services"
+
 ]).config([
   '$stateProvider'
   '$urlRouterProvider'
-  '$ionicAppProvider'
   'BASE_URL'
   '$httpProvider'
-  ($stateProvider, $urlRouterProvider, $ionicAppProvider, BASE_URL, $httpProvider) ->
+  ($stateProvider, $urlRouterProvider, BASE_URL, $httpProvider) ->
 
     $httpProvider.interceptors.push 'AuthInterceptor'
 
-    $ionicAppProvider.identify
-      app_id: '627f4314'
-      api_key: '08802936b07eeb891a3cad5efc08cb59252541816f75aa8d'
-
     $stateProvider
-      .state('app',
+      .state 'app',
+        cache: false
+        resolve:
+          currentUser : ( SessionFactory ) ->
+            SessionFactory.getSession()
+        controller: ( $scope, currentUser ) ->
+          $scope.currentUser = currentUser
         url: '/app'
         templateUrl: 'app/layout/menu-layout.html'
         abstract: true
-      ).state('app.dash',
+
+      .state 'app.dash',
         url: '/dash'
-        views:
-          mainContent:
-            templateUrl: 'templates/dashboard.html'
-            controller: 'DashCtrl'
-      ).state('app.sensorSetup',
-        resolve:
-          resolvedCustomerAccount: ($http) ->
-            $http.get BASE_URL+'/me/customer-account'
+        templateUrl: 'templates/dashboard.html'
+        controller: 'DashCtrl'
+
+      .state 'app.sensorSetup',
         url: '/sensor-setup'
-        views:
-          mainContent:
-            templateUrl: 'templates/sensor-setup.html'
-            controller: 'SensorSetupCtrl'
-      ).state('login',
+        templateUrl: 'templates/sensor-setup.html'
+        controller: 'SensorSetupCtrl'
+
+      .state 'login',
         url: '/login'
-        views:
-          '':
-            templateUrl: 'templates/login.html'
-            controller: 'SignInCtrl'
-      )
+        templateUrl: 'templates/login.html'
+        controller: 'SignInCtrl'
 
     $urlRouterProvider.otherwise ->
       if window.localStorage.getItem 'auth-token'
@@ -61,24 +51,25 @@ angular.module("hcMobile", [
 ]).run(($ionicPlatform, $rootScope, $ionicLoading, $timeout, $state, SessionFactory, AuthTokenFactory) ->
   $ionicPlatform.ready ->
 
-    pushNotification = window.plugins.pushNotification
+    if window.cordova
+      pushNotification = window.plugins.pushNotification
 
-    # register with APN/GCM, then send token to alerts server
-    if ionic.Platform.isAndroid()
-      token = localStorage.getItem 'Android_token'
-      unless token
-        pushNotification.register pushCallbacks.GCM.successfulRegistration, pushCallbacks.errorHandler,
-          senderID  : '125902103424'
-          ecb       : 'pushCallbacks.GCM.onNotification'
+      # register with APN/GCM, then send token to alerts server
+      if ionic.Platform.isAndroid()
+        token = localStorage.getItem 'Android_token'
+        unless token
+          pushNotification.register pushCallbacks.GCM.successfulRegistration, pushCallbacks.errorHandler,
+            senderID  : '125902103424'
+            ecb       : 'pushCallbacks.GCM.onNotification'
 
-    if ionic.Platform.isIOS()
-      token = localStorage.getItem 'iPhone_token'
-      unless token
-        pushNotification.register pushCallbacks.APN.successfulRegistration, pushCallbacks.errorHandler,
-          badge : 'true'
-          sound : 'true'
-          alert : 'true'
-          ecb   : 'pushCallbacks.APN.onNotification'
+      if ionic.Platform.isIOS()
+        token = localStorage.getItem 'iPhone_token'
+        unless token
+          pushNotification.register pushCallbacks.APN.successfulRegistration, pushCallbacks.errorHandler,
+            badge : 'true'
+            sound : 'true'
+            alert : 'true'
+            ecb   : 'pushCallbacks.APN.onNotification'
 
 
     # org.apache.cordova.statusbar required
