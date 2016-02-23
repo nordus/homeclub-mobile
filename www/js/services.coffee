@@ -107,7 +107,7 @@ services.factory('meta', ->
 services.factory 'alerttext', ( $filter ) ->
 
   sensorHubEvent: (message) ->
-    eventDate = $filter('date')(message.timestamp, 'MMM d h:mm a')
+    eventDate = $filter('date')(message.updateTime, 'MMM d h:mm a', 'UTC')
     eventResolved = message.sensorEventEnd isnt 0
     if eventResolved
       eventType = message.sensorEventEnd

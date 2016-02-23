@@ -3,23 +3,40 @@
   var app,
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova']);
+  app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']);
 
-  app.controller('DashCtrl', function($scope, alert, alerttext, latest, currentUser) {
+  app.controller('DashCtrl', function($scope, alert, alerttext, latest, currentUser, $firebaseObject) {
+    var ref;
     ga('send', 'screenview', {
       screenName: '/dashboard'
     });
     $scope.alerttext = alerttext;
-    $scope.refreshLatest = function() {
-      $scope.loading = true;
-      return latest.get({
-        sensorHubMacAddresses: currentUser.gateways[0].sensorHubs,
-        start: "'12 hours ago'"
-      }, function(data) {
-        $scope.loading = false;
-        $scope.$broadcast('scroll.refreshComplete');
-        return $scope.latest = data;
-      });
+    ref = new Firebase('https://homeclub-q.firebaseio.com/' + currentUser.gateways[0]._id);
+    $scope.sensorHubRealtime = $firebaseObject(ref.child('sensorHubs'));
+    $scope.latestNetworkHubPowerSource = $firebaseObject(ref.child('latestPowerStatus'));
+    $scope.latestNetworkHubRssi = $firebaseObject(ref.child('latestRssi'));
+    $scope.cssClassByRssiThreshold = function(rssi) {
+      var rssiNum;
+      if (rssi === void 0) {
+        return 'light';
+      }
+      rssiNum = Number(rssi);
+      switch (false) {
+        case !(rssiNum < -95):
+          return 'assertive';
+        case !(rssiNum < -80):
+          return 'energized';
+        default:
+          return 'balanced';
+      }
+    };
+    $scope.hasAlert = function(sensorHubMacAddress) {
+      var ref1;
+      return ((ref1 = $scope.sensorHubRealtime[sensorHubMacAddress]) != null ? ref1.latestAlert : void 0) !== void 0;
+    };
+    $scope.noAlert = function(sensorHubMacAddress) {
+      var ref1;
+      return ((ref1 = $scope.sensorHubRealtime[sensorHubMacAddress]) != null ? ref1.latestAlert : void 0) === void 0;
     };
     $scope.alerts = {};
     $scope.toggleAlerts = function(sensorHubMacAddress) {
@@ -33,16 +50,6 @@
         });
       }
     };
-    $scope.refreshLatest().$promise.then(function() {
-      $scope.hasAlert = function(sensorHubMacAddress) {
-        var ref;
-        return ((ref = $scope.latest[sensorHubMacAddress]) != null ? ref.latestAlert : void 0) !== void 0;
-      };
-      return $scope.noAlert = function(sensorHubMacAddress) {
-        var ref;
-        return ((ref = $scope.latest[sensorHubMacAddress]) != null ? ref.latestAlert : void 0) === void 0;
-      };
-    });
     return $scope.showOkIfNoAlerts = function(roomName) {
       return roomName === 'Water Detect' || roomName === 'Human Motion' || roomName === 'Item Movement';
     };

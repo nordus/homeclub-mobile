@@ -1,21 +1,41 @@
 
-app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova']
+app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']
 
 
-app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser) ->
+app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $firebaseObject) ->
 
   ga 'send', 'screenview', screenName:'/dashboard'
 
-  $scope.alerttext = alerttext
+  $scope.alerttext  = alerttext
 
-  $scope.refreshLatest = ->
+  ref               = new Firebase( 'https://homeclub-q.firebaseio.com/' + currentUser.gateways[0]._id )
 
-    $scope.loading = true
+  $scope.sensorHubRealtime            = $firebaseObject( ref.child( 'sensorHubs' ) )
+  $scope.latestNetworkHubPowerSource  = $firebaseObject( ref.child( 'latestPowerStatus' ) )
+  $scope.latestNetworkHubRssi         = $firebaseObject( ref.child( 'latestRssi' ) )
 
-    latest.get {sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
-      $scope.loading = false
-      $scope.$broadcast 'scroll.refreshComplete'
-      $scope.latest = data
+  $scope.cssClassByRssiThreshold = (rssi) ->
+    return 'light' if rssi is undefined
+    rssiNum = Number(rssi)
+    switch
+      when rssiNum < -95 then 'assertive'
+      when rssiNum < -80 then 'energized'
+      else 'balanced'
+
+  $scope.hasAlert                     = ( sensorHubMacAddress ) ->
+    $scope.sensorHubRealtime[sensorHubMacAddress]?.latestAlert != undefined
+
+  $scope.noAlert                      = ( sensorHubMacAddress ) ->
+    $scope.sensorHubRealtime[sensorHubMacAddress]?.latestAlert == undefined
+
+#  $scope.refreshLatest = ->
+#
+#    $scope.loading = true
+#
+#    latest.get {sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
+#      $scope.loading = false
+#      $scope.$broadcast 'scroll.refreshComplete'
+#      $scope.latest = data
 
   $scope.alerts = {}
 
@@ -27,9 +47,9 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser) ->
         $scope.alerts[sensorHubMacAddress] = alerts
 
   # set $scope.latest before defining methods that depend on it
-  $scope.refreshLatest().$promise.then ->
-    $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert != undefined
-    $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert == undefined
+#  $scope.refreshLatest().$promise.then ->
+#    $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert != undefined
+#    $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert == undefined
 
   $scope.showOkIfNoAlerts = ( roomName ) ->
     roomName in ['Water Detect', 'Human Motion', 'Item Movement']
