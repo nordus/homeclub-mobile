@@ -5,6 +5,16 @@
 
   app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']);
 
+  app.controller('ReportsCtrl', function($scope, fieldhistogram) {
+    $scope.searchParams = {
+      interval: 'hour',
+      start: '1 day ago'
+    };
+    return fieldhistogram.get($scope.searchParams, function(data) {
+      return $scope.chartData = data;
+    });
+  });
+
   app.controller('DashCtrl', function($scope, alert, alerttext, latest, currentUser, $firebaseObject) {
     var ref;
     ga('send', 'screenview', {

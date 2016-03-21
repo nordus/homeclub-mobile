@@ -39,6 +39,20 @@ meta = {
   }
 }
 
+
+services.factory 'fieldhistogram', ($resource, $rootScope, $window, BASE_URL) ->
+
+  currentUser = JSON.parse($window.localStorage.user)
+
+  defaultParams =
+    fields                : ['sensorHubData1', 'sensorHubData2', 'sensorHubData3']
+    start                 : 'august 10th at noon'
+    msgType               : 5
+    sensorHubMacAddresses : currentUser.gateways[0].sensorHubs
+
+  $resource BASE_URL+'/fieldhistograms', defaultParams
+
+
 services.factory('SessionFactory', ($window, $ionicPlatform, $timeout) ->
   _sessionFactory = {}
 

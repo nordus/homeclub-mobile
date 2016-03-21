@@ -5,7 +5,7 @@ angular.module("hcMobile", [
   'shared'
   "hcMobile.controllers"
   "hcMobile.services"
-
+  'highcharts-ng'
 ]).config([
   '$stateProvider'
   '$urlRouterProvider'
@@ -36,6 +36,11 @@ angular.module("hcMobile", [
         url: '/sensor-setup'
         templateUrl: 'templates/sensor-setup.html'
         controller: 'SensorSetupCtrl'
+
+      .state 'app.reports',
+        url: '/reports'
+        templateUrl: 'templates/reports.html'
+        controller: 'ReportsCtrl'
 
       .state 'login',
         url: '/login'

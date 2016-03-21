@@ -43,6 +43,18 @@
     }
   };
 
+  services.factory('fieldhistogram', function($resource, $rootScope, $window, BASE_URL) {
+    var currentUser, defaultParams;
+    currentUser = JSON.parse($window.localStorage.user);
+    defaultParams = {
+      fields: ['sensorHubData1', 'sensorHubData2', 'sensorHubData3'],
+      start: 'august 10th at noon',
+      msgType: 5,
+      sensorHubMacAddresses: currentUser.gateways[0].sensorHubs
+    };
+    return $resource(BASE_URL + '/fieldhistograms', defaultParams);
+  });
+
   services.factory('SessionFactory', function($window, $ionicPlatform, $timeout) {
     var _sessionFactory;
     _sessionFactory = {};

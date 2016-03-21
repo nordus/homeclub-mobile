@@ -7,6 +7,8 @@
   "dependencies": {
     "ngCordova": "~0.1.17-alpha",
     "angularfire": "^1.1.4",
-    "firebase": "^2.4.1"
+    "firebase": "^2.4.1",
+    "highcharts": "~4.2.3",
+    "highcharts-ng": "~0.0.11"
   }
 }
