@@ -3,7 +3,7 @@ app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova', 'fi
 
 
 
-app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate) ->
+app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate, $timeout, $window) ->
 
   $scope.searchParams =
     interval  : 'hour'
@@ -15,6 +15,11 @@ app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate) -
       $ionicSlideBoxDelegate.slide 0
       $ionicSlideBoxDelegate.update()
       $scope.$apply()
+
+  angular.element( $window ).bind 'resize', ->
+    $timeout ->
+      $scope.$broadcast 'highchartsng.reflow'
+    , 10
 
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $firebaseObject) ->
