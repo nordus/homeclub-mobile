@@ -3,13 +3,18 @@ app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova', 'fi
 
 
 
-app.controller 'ReportsCtrl', ($scope, fieldhistogram) ->
+app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate) ->
 
   $scope.searchParams =
     interval  : 'hour'
     start     : '1 day ago'
 
-  fieldhistogram.get $scope.searchParams, (data) -> $scope.chartData = data
+  fieldhistogram.get $scope.searchParams, (data) ->
+    $scope.chartData = data
+    setTimeout ->
+      $ionicSlideBoxDelegate.slide 0
+      $ionicSlideBoxDelegate.update()
+      $scope.$apply()
 
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $firebaseObject) ->

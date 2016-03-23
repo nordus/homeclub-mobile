@@ -1,10 +1,15 @@
+style.
+  .slider-pager { bottom: initial; top: 5px }
+
 ion-view(view-title='Reports')
 
   ion-nav-buttons(side='left')
     button(menu-toggle='left').button.button-icon.icon.ion-navicon
 
   ion-content.has-header
-    .card(ng-repeat='(sensorHubMacAddress, configArr) in chartData')
-      .item.item-divider {{ sensorHubMacAddress }}
-      .item(ng-repeat='config in configArr')
-        highchart(config='config')
+    ion-slide-box
+      ion-slide(ng-repeat='(sensorHubMacAddress, configArr) in chartData')
+        .item.item-divider
+        .item.item-divider {{ sensorHubMacAddress }}
+        .item(ng-repeat='config in configArr')
+          highchart(style='width:95%', config='config')

@@ -5,13 +5,18 @@
 
   app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']);
 
-  app.controller('ReportsCtrl', function($scope, fieldhistogram) {
+  app.controller('ReportsCtrl', function($scope, fieldhistogram, $ionicSlideBoxDelegate) {
     $scope.searchParams = {
       interval: 'hour',
       start: '1 day ago'
     };
     return fieldhistogram.get($scope.searchParams, function(data) {
-      return $scope.chartData = data;
+      $scope.chartData = data;
+      return setTimeout(function() {
+        $ionicSlideBoxDelegate.slide(0);
+        $ionicSlideBoxDelegate.update();
+        return $scope.$apply();
+      });
     });
   });
 
