@@ -28,6 +28,10 @@
         url: '/reports',
         templateUrl: 'templates/reports.html',
         controller: 'ReportsCtrl'
+      }).state('app.account', {
+        url: '/account',
+        templateUrl: 'templates/account.html',
+        controller: 'AccountCtrl'
       }).state('login', {
         url: '/login',
         templateUrl: 'templates/login.html',

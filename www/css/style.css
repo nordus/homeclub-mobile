@@ -8829,6 +8829,10 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.slider-pager {
+  bottom: initial;
+  top: 5px; }
+
 #sensor-setup .item-icon-left .icon {
   color: #444 !important; }
 

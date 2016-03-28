@@ -1,0 +1,41 @@
+ion-view(view-title='Account', cache-view='false')
+
+  ion-nav-buttons(side='left')
+    button(menu-toggle='left').button.button-icon.icon.ion-navicon
+
+  ion-nav-buttons(side='right')
+    button.button.button-clear(ng-click='save()') Save
+
+  ion-content.has-header
+
+    .list.card
+      .item
+        .item.item-icon-left
+          .i.icon.ion-home
+          | Home
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.houseName')
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.houseNumber')
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.streetName')
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.city')
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.state')
+      label.item.item-input
+        input(type='text', ng-model='customerAccount.zip')
+      .item
+        .item.item-icon-left
+          .i.icon.ion-person
+          | Contact
+      label.item.item-input
+        input(ng-model='customerAccount.name.first', type='text')
+      label.item.item-input
+        input(ng-model='customerAccount.name.last', type='text')
+      label.item.item-input
+        i.icon.ion-at.placeholder-icon
+        input(ng-model='user.email', type='email', disabled='disabled')
+      label.item.item-input
+        i.icon.ion-pound.placeholder-icon
+        input(ng-model='customerAccount.phone', type='text')

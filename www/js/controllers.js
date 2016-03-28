@@ -5,10 +5,28 @@
 
   app = angular.module("hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']);
 
-  app.controller('ReportsCtrl', function($scope, fieldhistogram, $ionicSlideBoxDelegate, $timeout, $window) {
+  app.controller('AccountCtrl', function($rootScope, $scope, customeraccount, SessionFactory, user) {
+    var gatewaysPopulated;
+    $scope.currentUser = SessionFactory.getSession();
+    gatewaysPopulated = $scope.currentUser.gateways;
+    $scope.customerAccount = new customeraccount($scope.currentUser);
+    $scope.user = new user($scope.currentUser.user);
+    return $scope.save = function() {
+      $scope.user.$update();
+      return $scope.customerAccount.$update(function(customerAccountResp) {
+        customerAccountResp.gateways = gatewaysPopulated;
+        SessionFactory.createSession(customerAccountResp);
+        return $rootScope.toast('Saved!');
+      });
+    };
+  });
+
+  app.controller('ReportsCtrl', function($scope, fieldhistogram, $ionicSlideBoxDelegate, $timeout, $window, SessionFactory) {
+    $scope.currentUser = SessionFactory.getSession();
     $scope.searchParams = {
       interval: 'hour',
-      start: '1 day ago'
+      start: '1 day ago',
+      sensorHubMacAddresses: $scope.currentUser.gateways[0].sensorHubs
     };
     fieldhistogram.get($scope.searchParams, function(data) {
       $scope.chartData = data;
@@ -18,10 +36,15 @@
         return $scope.$apply();
       });
     });
-    return angular.element($window).bind('resize', function() {
+    angular.element($window).bind('resize', function() {
       return $timeout(function() {
         return $scope.$broadcast('highchartsng.reflow');
       }, 10);
+    });
+    return Highcharts.setOptions({
+      global: {
+        useUTC: false
+      }
     });
   });
 

@@ -43,14 +43,22 @@
     }
   };
 
+  services.factory('user', function($resource, BASE_URL) {
+    return $resource(BASE_URL + '/users/:id', {
+      id: '@_id'
+    }, {
+      update: {
+        method: 'PUT'
+      }
+    });
+  });
+
   services.factory('fieldhistogram', function($resource, $rootScope, $window, BASE_URL) {
-    var currentUser, defaultParams;
-    currentUser = JSON.parse($window.localStorage.user);
+    var defaultParams;
     defaultParams = {
       fields: ['sensorHubData1', 'sensorHubData2', 'sensorHubData3'],
-      start: 'august 10th at noon',
-      msgType: 5,
-      sensorHubMacAddresses: currentUser.gateways[0].sensorHubs
+      start: '1 day ago',
+      msgType: 5
     };
     return $resource(BASE_URL + '/fieldhistograms', defaultParams);
   });

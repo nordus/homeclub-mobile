@@ -2,12 +2,28 @@
 app     = angular.module "hcMobile.controllers", ['ngSanitize', 'ngCordova', 'firebase']
 
 
+app.controller 'AccountCtrl', ($rootScope, $scope, customeraccount, SessionFactory, user) ->
+  $scope.currentUser = SessionFactory.getSession()
+  gatewaysPopulated = $scope.currentUser.gateways
+  $scope.customerAccount = new customeraccount($scope.currentUser)
+  $scope.user = new user($scope.currentUser.user)
 
-app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate, $timeout, $window) ->
+  $scope.save = ->
+    $scope.user.$update()
+    $scope.customerAccount.$update (customerAccountResp) ->
+      customerAccountResp.gateways = gatewaysPopulated
+      SessionFactory.createSession customerAccountResp
+      $rootScope.toast 'Saved!'
+
+
+app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate, $timeout, $window, SessionFactory) ->
+
+  $scope.currentUser = SessionFactory.getSession()
 
   $scope.searchParams =
     interval  : 'hour'
     start     : '1 day ago'
+    sensorHubMacAddresses: $scope.currentUser.gateways[0].sensorHubs
 
   fieldhistogram.get $scope.searchParams, (data) ->
     $scope.chartData = data
@@ -20,6 +36,10 @@ app.controller 'ReportsCtrl', ($scope, fieldhistogram, $ionicSlideBoxDelegate, $
     $timeout ->
       $scope.$broadcast 'highchartsng.reflow'
     , 10
+
+  Highcharts.setOptions
+    global:
+      useUTC: false
 
 
 app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $firebaseObject) ->
@@ -48,15 +68,6 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $fire
   $scope.noAlert                      = ( sensorHubMacAddress ) ->
     $scope.sensorHubRealtime[sensorHubMacAddress]?.latestAlert == undefined
 
-#  $scope.refreshLatest = ->
-#
-#    $scope.loading = true
-#
-#    latest.get {sensorHubMacAddresses:currentUser.gateways[0].sensorHubs, start:"'12 hours ago'"}, (data) ->
-#      $scope.loading = false
-#      $scope.$broadcast 'scroll.refreshComplete'
-#      $scope.latest = data
-
   $scope.alerts = {}
 
   $scope.toggleAlerts = ( sensorHubMacAddress ) ->
@@ -65,11 +76,6 @@ app.controller 'DashCtrl', ($scope, alert, alerttext, latest, currentUser, $fire
     else
       alert.query sensorHubMacAddress:sensorHubMacAddress, ( alerts ) ->
         $scope.alerts[sensorHubMacAddress] = alerts
-
-  # set $scope.latest before defining methods that depend on it
-#  $scope.refreshLatest().$promise.then ->
-#    $scope.hasAlert = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert != undefined
-#    $scope.noAlert  = ( sensorHubMacAddress ) -> $scope.latest[sensorHubMacAddress]?.latestAlert == undefined
 
   $scope.showOkIfNoAlerts = ( roomName ) ->
     roomName in ['Water Detect', 'Human Motion', 'Item Movement']

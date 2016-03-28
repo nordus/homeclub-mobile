@@ -40,15 +40,19 @@ meta = {
 }
 
 
-services.factory 'fieldhistogram', ($resource, $rootScope, $window, BASE_URL) ->
+services.factory 'user', ($resource, BASE_URL) ->
 
-  currentUser = JSON.parse($window.localStorage.user)
+  $resource BASE_URL+'/users/:id', id:'@_id',
+    update:
+      method: 'PUT'
+
+
+services.factory 'fieldhistogram', ($resource, $rootScope, $window, BASE_URL) ->
 
   defaultParams =
     fields                : ['sensorHubData1', 'sensorHubData2', 'sensorHubData3']
-    start                 : 'august 10th at noon'
+    start                 : '1 day ago'
     msgType               : 5
-    sensorHubMacAddresses : currentUser.gateways[0].sensorHubs
 
   $resource BASE_URL+'/fieldhistograms', defaultParams
 

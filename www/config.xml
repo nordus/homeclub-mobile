@@ -25,6 +25,8 @@
     HomeClub
   </author>
 
+  <preference name="orientation" value="portrait" />
+
   <!-- Customize your app and platform with the preference element. -->
   <preference name="phonegap-version"           value="cli-5.2.0" />
   <preference name="webviewbounce"              value="false" />

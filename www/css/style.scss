@@ -4,6 +4,8 @@ $positive: #4183c4 !default;
 
 @import "../lib/ionic/scss/ionic";
 
+.slider-pager { bottom: initial; top: 5px }
+
 #sensor-setup .item-icon-left .icon { color:#444 !important }
 #sensor-setup .item-checkbox > .item { padding-top:5px; padding-bottom:5px }
 #sensor-setup .checkbox input { left:54px }
